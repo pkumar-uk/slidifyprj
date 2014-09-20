@@ -1,0 +1,81 @@
+---
+title       : Interactive Data Visualization - An Example
+subtitle    : Life Expectancy across Globe
+author      : Perumal Kumar     
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---    
+
+## Challenge     
+
+
+
+The biggest chalenge a person creating a report faces is to make it fit the end user requirements. Often the end user gives unclear requirements and ends up giving more requirements when a report is created, sometimes requiring a minor modification to the parameters or requiring more from the data.     
+                
+
+
+Would it not be wonderful to have a solution that is interactive and looks appealing!  
+
+
+          
+"Life Expectancy Across the Globe" app is a great example of a way to do this.             
+                   
+                 
+Let us look at how it was done! 
+
+--- .class #id 
+
+## Solution
+
+R along with googleVis helps in creating interactive document. Shiny allows you to publish this to server that can be served to anybody on the net.
+
+googleVis package has several cool features that helps to create different kind of charts. The "Life Expectancy across Globe" application uses the following charts to make analysis of the WHO data interactive:-      
+- gvisTable - to create an interactive table to display    
+- gvisGeoChart - to Data on Map helping visualization     
+- gvisMotionChart - an interactive plot to look at trends
+- gvisMerge - to Merge the multiple plots to a page   
+
+Let us look at how easy is to produce interactive graph. We will do how the "Life Expectancy across Globe" app does.
+
+--- .class #id 
+
+## Interactive Chart - Code
+
+The code is below to create interactive chart 
+
+```{r,cache=TRUE}
+suppressPackageStartupMessages(library(googleVis))
+# Read Data
+a1<-"http://apps.who.int/gho/athena/data/data-verbose.csv?target=GHO/WHOSIS_000002,WHOSIS_000001,WHOSIS_000015&profile=verbose&filter=COUNTRY:*;REGION:AFR;REGION:AMR;REGION:SEAR;REGION:EUR;REGION:EMR;REGION:WPR;SEX:*"
+d1<-read.csv(a1)
+#filter to have a better set
+d11<-d1[d1$YEAR..CODE=="2012" & d1$"GHO..CODE." =="WHOSIS_000001" & d1$SEX..CODE. =="BTSX",
+        c("COUNTRY..DISPLAY.","Numeric")]
+#Modify column names
+names(d11) <- c("Country","Year")
+# Geo chart
+m<-gvisGeoChart(d11,locationvar="Country",colorvar="Year",                                               options=list( height=350,displayMode='auto',colorAxis="{values:[40,60,75,80],colors:[\'red', \'pink\', \'orange',\'green']}"))
+# Table
+q<-gvisTable(d11,options=list(page="enable",pageSize=5,sort="enable"))
+# Merge
+gt<-gvisMerge(m,q,horizontal=TRUE,
+                              tableOptions="cellspacing=\"20\" bgcolor=\"#AABBCC\"")
+```
+
+--- .class #id 
+
+## Interactive Chart - Chart
+
+```{r,results='asis'}
+print(gt,'chart')
+```
+
+Use the mouse on the above plots to see the interactive plot. You can change the table sort order as well
+
+If you liked it, visit http://perumalkumar.shinyapps.io/ShinyPrj1/   to see the code in action. You can also see the R code.
+
